@@ -1,6 +1,5 @@
 var dataCacheName = 'weatherData-v1';
-
-var cacheName = 'weatherPWA-step-6-1';
+//var cacheName = 'weatherPWA-step-6-1';
 //var filesToCache = [];
 var filesToCache = [
   '/',
@@ -22,21 +21,13 @@ var filesToCache = [
   '/images/wind.png'
 ];
 
-
 self.addEventListener('install', function(e) {
   console.log('[ServiceWorker] Install');
   e.waitUntil(
     caches.open(cacheName).then(function(cache) {
       console.log('[ServiceWorker] Caching app shell');
       return cache.addAll(filesToCache);
-    })
-  );
-});
-
-//self.addEventListener('activate', function(e) {
-  //console.log('[ServiceWorker] Activate');
-//});
-
+	  
 self.addEventListener('activate', function(e) {
   console.log('[ServiceWorker] Activate');
   e.waitUntil(
@@ -51,18 +42,12 @@ self.addEventListener('activate', function(e) {
   );
   return self.clients.claim();
 });
-
-//self.addEventListener('fetch', function(e) {
-  //console.log('[ServiceWorker] Fetch', e.request.url);
-  //e.respondWith(
-   // caches.match(e.request).then(function(response) {
-    //  return response || fetch(e.request);
-   // })
-  //);
-//});
+    })
+  );
+});
 
 self.addEventListener('fetch', function(e) {
-  console.log('[Service Worker] Fetch', e.request.url);
+  console.log('[ServiceWorker] Fetch', e.request.url);
   var dataUrl = 'https://query.yahooapis.com/v1/public/yql';
   if (e.request.url.indexOf(dataUrl) > -1) {
     /*
@@ -72,7 +57,7 @@ self.addEventListener('fetch', function(e) {
      * network" strategy:
      * https://jakearchibald.com/2014/offline-cookbook/#cache-then-network
      */
-    e.respondWith(
+  e.respondWith(
       caches.open(dataCacheName).then(function(cache) {
         return fetch(e.request).then(function(response){
           cache.put(e.request.url, response.clone());
@@ -86,11 +71,10 @@ self.addEventListener('fetch', function(e) {
      * "Cache, falling back to the network" offline strategy:
      * https://jakearchibald.com/2014/offline-cookbook/#cache-falling-back-to-network
      */
-    e.respondWith(
-      caches.match(e.request).then(function(response) {
-        return response || fetch(e.request);
-      })
-    );
+  e.respondWith(
+    caches.match(e.request).then(function(response) {
+      return response || fetch(e.request);
+    })
+  );
   }
 });
-
